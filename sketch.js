@@ -1,12 +1,19 @@
 var rex, rexCorrendo;
 var terra ;
-var terra_plana
-var invisiblie_ground
+var terra_plana ;
+var invisiblie_ground ;
+var clouds ;
+var joinville_chove_muito
+
+
 
 
 function preload(){
 rexCorrendo = loadAnimation("trex1.png","trex3.png","trex4.png");
 terra_plana = loadImage ("ground2.png");
+joinville_chove_muito = loadImage ("cloud.png") ;
+
+
 
 }
 
@@ -40,7 +47,7 @@ terra.x = terra.width/2 ;
 function draw(){
 background("white");
 //console.log (rex.y) ;
-console.log(frameCount);
+//console.log(frameCount);
 
 if(keyDown("space")&& rex.y >= 145){
 rex.velocityY = -10;
@@ -58,5 +65,23 @@ drawSprites();
 }
 
 function cloud(){
+if(frameCount % 60=== 0){
+clouds=createSprite (600, 100, 40, 10) ;
+clouds.addImage (joinville_chove_muito) ;
+clouds.y = Math.round (random(5, 100)) ;
+
+
+
+clouds.velocityX =-3 ;
+clouds.depth = rex.depth ;
+rex.depth += 1 ;
+
+clouds.lifetime = 250;
+
+}
+
+
+
+
 
 }
