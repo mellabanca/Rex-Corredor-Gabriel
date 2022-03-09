@@ -60,6 +60,9 @@ grupoNuvens = new Group();
 
 grupoCactos = new Group();
 
+rex.debug = false;
+
+rex.setCollider("circle",0,0,40);
 
 //var aleatorio = Math.round(random(1,100));
 //console.log(aleatorio);
@@ -72,29 +75,35 @@ function draw(){
    //console.log(frameCount);
 
 if(estado === JOGANDO){
+   if(keyDown("space")&& rex.y >= 145){
+      rex.velocityY = -11;
+   }
 
-} else if (estado === PERDEU){
-
+    rex.velocityY += 1;
+   terra.velocityX = -2; 
+ if(terra.x < 0){
+ terra.x = terra.width/2 ;
 }
-
-
-
-
-if(keyDown("space")&& rex.y >= 145){
-rex.velocityY = -11;
-}
-
-rex.velocityY += 1;
-terra.velocityX = -2; 
-if(terra.x < 0){
-terra.x = terra.width/2 ;
-}
-
-rex.collide(invisiblie_ground);
 cloud();
 cactos();
-drawSprites();
 points += Math.round(frameCount / 60) ;
+
+if (grupoCactos.isTouching(rex)) {
+   estado = PERDEU ;
+
+}
+
+
+
+} else if (estado === PERDEU){
+terra.velocityX = 0 ;
+grupoCactos.setVelocityXEach(0) ;
+grupoNuvens.setVelocityXEach(0) ;
+}
+rex.collide(invisiblie_ground);
+
+drawSprites();
+
 text(points, 500, 50) ;
 }
 
