@@ -16,6 +16,11 @@ var grupoCactos;
 var JOGANDO = 1;
 var PERDEU = 0;
 var estado = JOGANDO;
+var colisao
+var game_over
+var reset
+var abacaxi 
+var mamao 
 
 
 function preload(){
@@ -28,7 +33,9 @@ cacto3 = loadImage("obstacle3.png")
 cacto4 = loadImage("obstacle4.png")
 cacto5 = loadImage("obstacle5.png")
 cacto6 = loadImage("obstacle6.png")
-
+colisao =loadAnimation("trex_collided.png") ;
+abacaxi = loadImage ("gameOver.png") ;
+mamao = loadImage ("restart.png") ;
 
 }
 
@@ -41,6 +48,15 @@ rex = createSprite(50, 160, 20, 50);
 rex.scale = 0.5;
 
 rex.addAnimation("correndo", rexCorrendo);
+rex.addAnimation("parado", colisao) ;
+game_over = createSprite (300, 50);
+game_over.addImage (abacaxi) ;
+reset = createSprite(300, 140) ; 
+reset.addImage (mamao) ;
+reset.scale = 0.4
+
+
+
 
 borda = createEdgeSprites();
 
@@ -87,6 +103,8 @@ if(estado === JOGANDO){
 cloud();
 cactos();
 points += Math.round(frameCount / 60) ;
+game_over.visible = false ;
+reset.visible = false ;
 
 if (grupoCactos.isTouching(rex)) {
    estado = PERDEU ;
@@ -99,7 +117,18 @@ if (grupoCactos.isTouching(rex)) {
 terra.velocityX = 0 ;
 grupoCactos.setVelocityXEach(0) ;
 grupoNuvens.setVelocityXEach(0) ;
-}
+rex.changeAnimation("parado") ;
+grupoCactos.setLifetimeEach(-1) ;
+grupoNuvens.setLifetimeEach(-1) ;
+rex.velocityY = 0 ;
+reset.visible = true ;
+game_over.visible = true ; 
+
+
+
+
+
+ }
 rex.collide(invisiblie_ground);
 
 drawSprites();
