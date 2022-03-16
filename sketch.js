@@ -21,6 +21,18 @@ var game_over
 var reset
 var abacaxi 
 var mamao 
+var record
+var globo
+var band
+var mensagem = "Isso é uma mensagem";
+
+
+
+
+
+
+
+
 
 
 function preload(){
@@ -36,6 +48,13 @@ cacto6 = loadImage("obstacle6.png")
 colisao =loadAnimation("trex_collided.png") ;
 abacaxi = loadImage ("gameOver.png") ;
 mamao = loadImage ("restart.png") ;
+record = loadSound("jump.mp3")
+globo = loadSound("die.mp3")
+band = loadSound("checkPoint.mp3")
+
+
+
+
 
 }
 
@@ -54,9 +73,6 @@ game_over.addImage (abacaxi) ;
 reset = createSprite(300, 140) ; 
 reset.addImage (mamao) ;
 reset.scale = 0.4
-
-
-
 
 borda = createEdgeSprites();
 
@@ -78,25 +94,32 @@ grupoCactos = new Group();
 
 rex.debug = false;
 
-rex.setCollider("circle",0,0,40);
+rex.setCollider("rectangle",0,0,60,70);
 
 //var aleatorio = Math.round(random(1,100));
 //console.log(aleatorio);
 
+
 }
 
 function draw(){
+   
+   //console.log(mensagem);
    background("white");
    //console.log (rex.y) ;
    //console.log(frameCount);
 
 if(estado === JOGANDO){
    if(keyDown("space")&& rex.y >= 145){
-      rex.velocityY = -11;
-   }
+      rex.velocityY = -11  
+      record.play()
 
+   }
+if (points > 0 && points % 100 === 0) {
+   band.play() ;
+}
     rex.velocityY += 1;
-   terra.velocityX = -2; 
+   terra.velocityX = -(4 + points / 100) ; 
  if(terra.x < 0){
  terra.x = terra.width/2 ;
 }
@@ -108,7 +131,7 @@ reset.visible = false ;
 
 if (grupoCactos.isTouching(rex)) {
    estado = PERDEU ;
-
+globo.play()
 }
 
 
@@ -124,16 +147,20 @@ rex.velocityY = 0 ;
 reset.visible = true ;
 game_over.visible = true ; 
 
-
-
-
-
  }
 rex.collide(invisiblie_ground);
+
+if(mousePressedOver(reset)){
+   restart();
+}
 
 drawSprites();
 
 text(points, 500, 50) ;
+}
+
+function restart(){
+   
 }
 
 function cloud(){
@@ -156,7 +183,7 @@ grupoNuvens.add(clouds);
 function cactos (){
 if(frameCount % 60 ===0){
 var planta = createSprite(600, 165, 10, 40) ;
-planta.velocityX = -6
+planta.velocityX = -(6 + points / 100)
 var infinito = Math.round(random(1, 6)) ;
 switch (infinito) {
      case 1:planta.addImage(cacto1);
