@@ -1,188 +1,226 @@
-var Rex, RexCorrendo;
-var chao;
-var chao2;
-var grama;
-var nuvem;
-var nuvemImagem;
-var I1,I2,I3,I4,I5,I6;
-var placar=0;
-var grupoInimigos;
+var rex, rexCorrendo;
+var terra ;
+var terra_plana ;
+var invisiblie_ground ;
+var clouds ;
+var joinville_chove_muito
+var cacto1
+var cacto2
+var cacto3
+var cacto4
+var cacto5
+var cacto6
+var points
 var grupoNuvens;
+var grupoCactos;
 var JOGANDO = 1;
-var ACABOU = 0;
+var PERDEU = 0;
 var estado = JOGANDO;
-var morreu;
-var restart;
-var imagemRestart;
-var gameover;
-var imagemGameover;
-var pular;
-var derrota;
-var checkpoint;
+var colisao
+var game_over
+var reset
+var abacaxi 
+var mamao 
+var record
+var globo
+var band
+var mensagem = "Isso é uma mensagem";
+
+
+
+
+
+
+
+
+
 
 function preload(){
-RexCorrendo = loadAnimation("trex1.png","trex3.png","trex4.png");
-grama= loadImage('ground2.png');
-nuvemImagem=loadImage('cloud.png');
-I1=loadImage('obstacle1.png');
-I2=loadImage('obstacle2.png');
-I3=loadImage('obstacle3.png');
-I4=loadImage('obstacle4.png');
-I5=loadImage('obstacle5.png');
-I6=loadImage('obstacle6.png');
-morreu=loadAnimation('trex_collided.png');
-imagemRestart=loadImage('restart.png');
-imagemGameover=loadImage('gameOver.png');
-pular=loadSound('jump.mp3');
-derrota=loadSound('die.mp3');
-checkpoint=loadSound('checkPoint.mp3');
+rexCorrendo = loadAnimation("trex1.png","trex3.png","trex4.png");
+terra_plana = loadImage ("ground2.png");
+joinville_chove_muito = loadImage ("cloud.png") ;
+cacto1 = loadImage("obstacle1.png") 
+cacto2 = loadImage("obstacle2.png")
+cacto3 = loadImage("obstacle3.png")
+cacto4 = loadImage("obstacle4.png")
+cacto5 = loadImage("obstacle5.png")
+cacto6 = loadImage("obstacle6.png")
+colisao =loadAnimation("trex_collided.png") ;
+abacaxi = loadImage ("gameOver.png") ;
+mamao = loadImage ("restart.png") ;
+record = loadSound("jump.mp3")
+globo = loadSound("die.mp3")
+band = loadSound("checkPoint.mp3")
+
+
+
+
+
 }
 
 function setup(){
+
 createCanvas(windowWidth,windowHeight);
-Rex = createSprite(50, height-70, 20, 50);
-Rex.addAnimation("correndo", RexCorrendo);
-Rex.addAnimation('morreu',morreu);
-Rex.scale = 0.5;
+
+rex = createSprite(50, height-70, 20, 50);
+
+rex.scale = 0.5;
+
+rex.addAnimation("correndo", rexCorrendo);
+rex.addAnimation("parado", colisao) ;
+game_over = createSprite (width/2, height/2-50);
+game_over.addImage (abacaxi) ;
+reset = createSprite(width/2, height/2) ; 
+reset.addImage (mamao) ;
+reset.scale = 0.4
 
 borda = createEdgeSprites();
 
-chao=createSprite(width/2,height-80,width,125);
-chao.addImage('grama',grama);
-chao.x=chao.width/2;
+terra = createSprite(width/2, height-80, width, 125) ;
 
-chao2=createSprite(width/2,height-10,width,125);
-chao2.visible=false;
+invisiblie_ground = createSprite (width/2, height-10, width, 125) ;
 
-var numero = Math.round(random(1, 100));
-console.log(numero);
+invisiblie_ground.visible = false ;
 
-grupoInimigos = new Group();
+terra.addImage (terra_plana) ;
+
+terra.x = terra.width/2 ; 
+
+points = 0
+
 grupoNuvens = new Group();
 
-//Rex.debug = true;
-Rex.setCollider("circle",0,0,40);
+grupoCactos = new Group();
 
-gameover=createSprite(width/2,height/2-50);
-gameover.addImage(imagemGameover);
-restart=createSprite(width/2,height/2);
-restart.addImage(imagemRestart);
-restart.scale=0.8;
+rex.debug = false;
 
-//inimigo.velocityX = 5;
+rex.setCollider("rectangle",0,0,60,70);
+
+//var aleatorio = Math.round(random(1,100));
+//console.log(aleatorio);
+
 
 }
 
 function draw(){
-background("white");
-//console.log(Rex.y);
-//console.log("estado do jogo:"+estado);
+   
+   //console.log(mensagem);
+   background("white");
+   //console.log (rex.y) ;
+   //console.log(frameCount);
 
 if(estado === JOGANDO){
-    gameover.visible=false;
-    restart.visible=false;
-    chao.velocityX=-(4+placar/100);
-    if(touches.length > 0 || keyDown("space") && Rex.y>=155){
-        Rex.velocityY = -12;
-        pular.play();
-        touches = [];
-    }
-if(chao.x<0){
-    chao.x=chao.width/2;
+   if(keyDown("space")&& rex.y >= height-150 || touches.length > 0 && rex.y >= height-150){
+      rex.velocityY = -11  
+      record.play()
+      touches = [];
+   }
+if (points > 0 && points % 100 === 0) {
+   band.play() ;
 }
-Rex.velocityY += 1;
-placar+=Math.round(frameRate()/60);
-nuvens();
-inimigos();
-if(grupoInimigos.isTouching(Rex)){
-    estado=ACABOU;
-    derrota.play();
+    rex.velocityY += 1;
+   terra.velocityX = -(4 + points / 100) ; 
+ if(terra.x < 0){
+ terra.x = terra.width/2 ;
 }
-if(placar > 0 && placar % 100 === 0){
-    checkpoint.play();
-    checkpoint.setVolume(0.5);
-}
+cloud();
+cactos();
+points += Math.round(frameRate() / 60) ;
+game_over.visible = false ;
+reset.visible = false ;
 
-    
-} else if (estado === ACABOU){
-    gameover.visible=true;
-    restart.visible=true;
-    Rex.changeAnimation("morreu");
-chao.velocityX=0;
-Rex.velocityY=0;
-grupoInimigos.setVelocityXEach(0);
-grupoNuvens.setVelocityXEach(0);
-grupoInimigos.setLifetimeEach(-1);
-grupoNuvens.setLifetimeEach(-1);
-if(mousePressedOver(restart) || touches.length > 0){
-    reset();
-    touches = [];
-}
-
+if (grupoCactos.isTouching(rex)) {
+   estado = PERDEU ;
+globo.play()
 }
 
 
 
-Rex.collide(chao2);
+} else if (estado === PERDEU){
+terra.velocityX = 0 ;
+grupoCactos.setVelocityXEach(0) ;
+grupoNuvens.setVelocityXEach(0) ;
+rex.changeAnimation("parado") ;
+grupoCactos.setLifetimeEach(-1) ;
+grupoNuvens.setLifetimeEach(-1) ;
+rex.velocityY = 0 ;
+reset.visible = true ;
+game_over.visible = true ; 
+
+if(mousePressedOver(reset) || touches.length > 0){
+   restart();
+   touches = [];
+}
+ }
+rex.collide(invisiblie_ground);
+
 
 
 drawSprites();
-textSize(15);
-textFont('Courier New');
-text(placar,50,50);
+
+textSize(18);
+text(points, width-100, height/2) ;
+}
+
+function restart(){
+   estado = JOGANDO ;
+grupoNuvens.destroyEach(); 
+grupoCactos.destroyEach(); 
+rex.changeAnimation("correndo") ;
+points = 0 
+   
 
 
 }
 
-function reset(){
-    estado=JOGANDO;
-    grupoNuvens.destroyEach();
-    grupoInimigos.destroyEach();
-    Rex.changeAnimation('correndo');
-    placar=0;
+function cloud(){
+if(frameCount % 60=== 0){
+clouds=createSprite (width+20, height-300, 40, 10) ;
+clouds.addImage (joinville_chove_muito) ;
+clouds.y = Math.round (random(10, height/2)) ;
+
+
+
+clouds.velocityX =-3 ;
+clouds.depth = rex.depth ;
+rex.depth += 1 ;
+
+clouds.lifetime = 250;
+
+grupoNuvens.add(clouds);
+
+}}
+function cactos (){
+if(frameCount % 60 ===0){
+var planta = createSprite(width, height-95, 10, 40) ;
+planta.velocityX = -(6 + points / 100)
+var infinito = Math.round(random(1, 6)) ;
+switch (infinito) {
+     case 1:planta.addImage(cacto1);
+        break;
+     case 2:planta.addImage(cacto2);
+        break;
+     case 3:planta.addImage(cacto3);
+        break;
+     case 4:planta.addImage(cacto4);
+        break;
+     case 5:planta.addImage(cacto5);
+        break;
+     case 6:planta.addImage(cacto6) ;
+        break;
+
+    default:
+        break;
+}
+planta.scale = 0.5 ;
+planta.lifetime = 300 ;
+
+grupoCactos.add(planta);
+
 }
 
-function nuvens(){
-    if(frameCount%60===0){
-        nuvem=createSprite(width+20,height-300,40,10);
-        nuvem.addImage(nuvemImagem);
-        nuvem.y=Math.round(random(10,height/2));
-        nuvem.scale=0.6
-        nuvem.velocityX=-3;
 
-        nuvem.lifetime = 250;
-
-        nuvem.depth=Rex.depth;
-        Rex.depth+=1;
-
-        grupoNuvens.add(nuvem);
-    }
- 
 }
-function inimigos(){
-    if(frameCount%60===0){
-        var inimigo=createSprite(width,height-95,10,40);
-        inimigo.velocityX=-(6+placar/100);
-        var x=Math.round(random(1,6));
-        switch(x){
-            case 1:inimigo.addImage(I1);
-            break;
-            case 2:inimigo.addImage(I2);
-            break;
-            case 3:inimigo.addImage(I3);
-            break;
-            case 4:inimigo.addImage(I4);
-            break;
-            case 5:inimigo.addImage(I5);
-            break;
-            case 6:inimigo.addImage(I6);
-            break;
-            default:break;
-        }
-        inimigo.scale=0.5;
-        inimigo.lifetime=300;
 
-        grupoInimigos.add(inimigo);
-    }
-}
+
 
